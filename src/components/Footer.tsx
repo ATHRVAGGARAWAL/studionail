@@ -8,8 +8,7 @@ const pageLinks = [
   { to: "/shop", label: "Shop" },
   { to: "/cart", label: "Cart" },
   { to: "/feed", label: "Instagram" },
-  { to: "/booking", label: "Booking" },
-  { to: "/admin", label: "Admin" }
+  { to: "/booking", label: "Booking" }
 ];
 
 const socialLinks = [

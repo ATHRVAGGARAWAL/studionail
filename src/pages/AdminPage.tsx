@@ -1,7 +1,8 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { CalendarDays, CheckCircle2, Package, Plus, ShoppingBag, Trash2, Truck } from "lucide-react";
+import { CalendarDays, CheckCircle2, LogOut, Package, Plus, ShoppingBag, Trash2, Truck } from "lucide-react";
 import { SectionIntro } from "@/components/SectionIntro";
 import { type ProductCategory } from "@/data/storefront";
+import { useAdminAccess } from "@/state/adminAccess";
 import { useStore, type OrderStatus } from "@/state/store";
 
 const categoryOptions: Exclude<ProductCategory, "All">[] = [
@@ -26,6 +27,7 @@ const initialDraft = {
 };
 
 export function AdminPage() {
+  const { logout } = useAdminAccess();
   const { products, orders, addProduct, deleteProduct, updateProductStock, adjustProductStock, updateOrderStatus } =
     useStore();
   const [draft, setDraft] = useState(initialDraft);
@@ -78,11 +80,21 @@ export function AdminPage() {
     <main className="page-shell space-y-6 pb-8 pt-6">
       <section className="surface-panel overflow-hidden rounded-[2rem] px-5 py-6 sm:px-6">
         <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
-          <SectionIntro
-            eyebrow="Admin dashboard"
-            title="Manage orders, stock, and your product catalog."
-            description="This dashboard gives you a local working console for the shop data. Orders can be advanced through processing states, while product stock and catalog entries are editable from the same screen."
-          />
+          <div className="space-y-4">
+            <SectionIntro
+              eyebrow="Admin dashboard"
+              title="Manage orders, stock, and your product catalog."
+              description="This dashboard gives you a local working console for the shop data. Orders can be advanced through processing states, while product stock and catalog entries are editable from the same screen."
+            />
+            <button
+              type="button"
+              onClick={logout}
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-outline-soft bg-white/72 px-4 py-3 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-brand-ink transition hover:text-brand"
+            >
+              <LogOut className="h-4 w-4 text-brand" />
+              Sign out
+            </button>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-[1.25rem] bg-white/72 px-4 py-4">
               <p className="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-secondary">Products</p>
@@ -324,11 +336,7 @@ export function AdminPage() {
               {products.map((product) => (
                 <article key={product.id} className="rounded-[1.5rem] bg-white/72 p-4">
                   <div className="flex gap-4">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="h-24 w-20 rounded-[1rem] object-cover"
-                    />
+                    <img src={product.image} alt={product.name} className="h-24 w-20 rounded-[1rem] object-cover" />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">

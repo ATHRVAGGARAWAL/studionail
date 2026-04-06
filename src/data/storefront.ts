@@ -1,4 +1,31 @@
 export type ProductCategory = "All" | "Minimalist" | "Avant-Garde" | "Neon" | "Signature";
+export type NailLength = "Short" | "Medium" | "Long";
+export type NailBedFit = "Petite" | "Balanced" | "Wide";
+export type FinishPreviewId = "gloss" | "matte" | "chrome" | "sheer";
+export type StyleMood = "Quiet luxury" | "Statement" | "Bridal" | "Playful";
+
+export interface ProductFinishPreview {
+  id: FinishPreviewId;
+  label: string;
+  description: string;
+}
+
+export interface ProductGuidance {
+  recommendedLengths: NailLength[];
+  nailBedFit: NailBedFit[];
+  styleTags: string[];
+  finishPreviews: ProductFinishPreview[];
+  tip: string;
+}
+
+export interface ProductTryOn {
+  baseColor: string;
+  accentColor: string;
+  glowColor: string;
+  defaultScale: number;
+  defaultRotation: number;
+  defaultOpacity: number;
+}
 
 export interface Product {
   id: string;
@@ -12,6 +39,8 @@ export interface Product {
   description: string;
   image: string;
   reviewCount: number;
+  guidance?: ProductGuidance;
+  tryOn?: ProductTryOn;
 }
 
 export interface ShapeCollection {

@@ -12,8 +12,7 @@ const navLinks = [
   { to: "/shop", label: "Shop" },
   { to: "/cart", label: "Cart" },
   { to: "/feed", label: "Feed" },
-  { to: "/booking", label: "Book" },
-  { to: "/admin", label: "Admin" }
+  { to: "/booking", label: "Book" }
 ];
 
 export function Header({ cartCount, onMenuClick }: HeaderProps) {

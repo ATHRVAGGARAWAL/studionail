@@ -86,30 +86,23 @@ export function QuickShopModal({ product, onAddToBag, onClose }: QuickShopModalP
                 <h2 className="editorial-text mt-3 text-[2.7rem] font-black uppercase leading-[0.88] text-brand-ink">
                   {product.name}
                 </h2>
-                <p className="mt-2 text-base italic text-secondary">
-                  Available in: {product.finish}
-                </p>
+                <p className="mt-2 text-base italic text-secondary">Available in: {product.finish}</p>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between gap-4">
-                  <p className="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-secondary">
-                    Set size
+                  <p className="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-secondary">Set size</p>
+                  <p className="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-brand">
+                    {product.shape}
                   </p>
-                  <button
-                    type="button"
-                    className="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-brand underline underline-offset-4"
-                  >
-                    Find my size
-                  </button>
                 </div>
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-4 gap-2">
                   {sizes.map((size) => (
                     <button
                       key={size}
                       type="button"
                       onClick={() => setSelectedSize(size)}
-                      className={`flex min-h-[3.75rem] items-center justify-center rounded-[1rem] border px-2 text-sm font-bold transition ${
+                      className={`flex min-h-[2.75rem] items-center justify-center rounded-[0.8rem] border px-2 text-[0.78rem] font-bold transition ${
                         selectedSize === size
                           ? "cta-gradient border-transparent text-white"
                           : "border-outline-soft bg-white/72 text-brand-ink"
@@ -139,7 +132,7 @@ export function QuickShopModal({ product, onAddToBag, onClose }: QuickShopModalP
                   onClose();
                 }}
                 disabled={product.stock <= 0}
-                className="cta-gradient flex min-h-14 w-full items-center justify-center gap-3 rounded-full px-6 text-[0.74rem] font-bold uppercase tracking-[0.28em] text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+                className="cta-gradient flex min-h-12 w-full items-center justify-center gap-3 rounded-full px-6 text-[0.68rem] font-bold uppercase tracking-[0.24em] text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {product.stock <= 0 ? "Sold out" : "Add to bag"}
                 <ArrowRight className="h-4 w-4" />
@@ -150,7 +143,7 @@ export function QuickShopModal({ product, onAddToBag, onClose }: QuickShopModalP
                 )}
                 target="_blank"
                 rel="noreferrer"
-                className="flex min-h-14 items-center justify-center gap-3 rounded-full border border-outline-soft bg-white/72 px-6 text-[0.74rem] font-bold uppercase tracking-[0.28em] text-brand-ink transition hover:border-brand hover:text-brand"
+                className="flex min-h-12 items-center justify-center gap-3 rounded-full border border-outline-soft bg-white/72 px-6 text-[0.68rem] font-bold uppercase tracking-[0.24em] text-brand-ink transition hover:border-brand hover:text-brand"
               >
                 <MessageCircle className="h-4 w-4" />
                 WhatsApp

@@ -12,8 +12,7 @@ const links = [
   { to: "/shop", title: "Shop", copy: "Browse curated press-on collections" },
   { to: "/cart", title: "Cart", copy: "Review items and continue checkout" },
   { to: "/feed", title: "Feed", copy: "Preview the studio's latest visual stories" },
-  { to: "/booking", title: "Booking", copy: "Tap through service, date, and confirmation" },
-  { to: "/admin", title: "Admin", copy: "Manage orders, stock, and product updates" }
+  { to: "/booking", title: "Booking", copy: "Tap through service, date, and confirmation" }
 ];
 
 export function MenuSheet({ open, onClose }: MenuSheetProps) {

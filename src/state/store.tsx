@@ -44,7 +44,7 @@ interface StoreContextValue extends StoreState {
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
 }
 
-const STORAGE_KEY = "studionail-store-v1";
+const STORAGE_KEY = "studionail-store-v2";
 
 const seedOrders: Order[] = [
   {
@@ -86,6 +86,16 @@ function normalizeProducts(products: Product[]) {
   }));
 }
 
+function normalizeOrders(orders: Order[], products: Product[]) {
+  return orders.map((order) => ({
+    ...order,
+    unitPrice:
+      typeof order.unitPrice === "number"
+        ? order.unitPrice
+        : products.find((product) => product.id === order.productId)?.price ?? 0
+  }));
+}
+
 function loadInitialState(): StoreState {
   const fallbackState: StoreState = {
     products: normalizeProducts(seedProducts),
@@ -107,7 +117,7 @@ function loadInitialState(): StoreState {
 
     return {
       products: normalizeProducts(parsed.products ?? seedProducts),
-      orders: Array.isArray(parsed.orders) ? parsed.orders : seedOrders
+      orders: normalizeOrders(Array.isArray(parsed.orders) ? parsed.orders : seedOrders, normalizeProducts(parsed.products ?? seedProducts))
     };
   } catch {
     return fallbackState;
@@ -120,10 +130,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<StoreState>(() => loadInitialState());
 
   function persist(nextState: StoreState) {
-    setState(nextState);
+    const normalizedState = {
+      ...nextState,
+      products: normalizeProducts(nextState.products)
+    };
+
+    setState(normalizedState);
 
     if (typeof window !== "undefined") {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState));
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizedState));
     }
   }
 

@@ -112,6 +112,10 @@ button {
   display: none;
 }
 
+.filter-fade {
+  mask-image: linear-gradient(90deg, transparent, black 1rem, black calc(100% - 1rem), transparent);
+}
+
 .editorial-text {
   font-family: var(--font-editorial);
   letter-spacing: -0.05em;

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "@/components/AppShell";
+import { AdminAccessPage } from "@/pages/AdminAccessPage";
 import { BookingPage } from "@/pages/BookingPage";
 import { AdminPage } from "@/pages/AdminPage";
 import { CartPage } from "@/pages/CartPage";
@@ -9,7 +10,18 @@ import { HomePage } from "@/pages/HomePage";
 import { ShopPage } from "@/pages/ShopPage";
 import { buildWhatsAppUrl } from "@/lib/contact";
 import { type Product } from "@/data/storefront";
+import { AdminAccessProvider, useAdminAccess } from "@/state/adminAccess";
 import { StoreProvider, useStore } from "@/state/store";
+
+function AdminRoute() {
+  const { isAuthenticated } = useAdminAccess();
+
+  if (!isAuthenticated) {
+    return <AdminAccessPage />;
+  }
+
+  return <AdminPage />;
+}
 
 function AppContent() {
   const { orders, placeOrder } = useStore();
@@ -63,7 +75,7 @@ function AppContent() {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/feed" element={<FeedPage />} />
         <Route path="/booking" element={<BookingPage />} />
-        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin" element={<AdminRoute />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AppShell>
@@ -72,10 +84,12 @@ function AppContent() {
 
 export function App() {
   return (
-    <StoreProvider>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </StoreProvider>
+    <AdminAccessProvider>
+      <StoreProvider>
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </StoreProvider>
+    </AdminAccessProvider>
   );
 }

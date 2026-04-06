@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
-import { BrandLockup } from "@/components/BrandLockup";
 import { EditorialPreviewModal } from "@/components/EditorialPreviewModal";
 import { SectionIntro } from "@/components/SectionIntro";
 import { editorialPosts, shapeCollections } from "@/data/storefront";
@@ -31,11 +30,7 @@ export function HomePage() {
             />
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(75,33,49,0.08),rgba(182,13,61,0.78))]" />
 
-            <div className="relative z-10 flex min-h-[34rem] flex-col justify-between">
-              <div className="self-start rounded-[1.5rem] border border-white/20 bg-white/10 p-3 backdrop-blur-md">
-                <BrandLockup size="lg" tone="light" />
-              </div>
-
+            <div className="relative z-10 flex min-h-[34rem] flex-col justify-end">
               <div>
               <p className="text-[0.68rem] font-bold uppercase tracking-[0.3em] text-white/85">
                 Electric chic press-on nails
