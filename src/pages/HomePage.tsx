@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
-import { EditorialPreviewModal } from "@/components/EditorialPreviewModal";
 import { SectionIntro } from "@/components/SectionIntro";
-import { editorialPosts, shapeCollections } from "@/data/storefront";
+import { shapeCollections } from "@/data/storefront";
 import { useStore } from "@/state/store";
 
 const trustImages = [
@@ -15,8 +14,6 @@ const trustImages = [
 
 export function HomePage() {
   const { products } = useStore();
-  const [previewPostId, setPreviewPostId] = useState<string | null>(null);
-  const previewPost = editorialPosts.find((post) => post.id === previewPostId) ?? null;
 
   return (
     <>
@@ -33,14 +30,13 @@ export function HomePage() {
             <div className="relative z-10 flex min-h-[34rem] flex-col justify-end">
               <div>
               <p className="text-[0.68rem] font-bold uppercase tracking-[0.3em] text-white/85">
-                Electric chic press-on nails
+                Nail Art Studio
               </p>
               <h1 className="editorial-text mt-4 max-w-xl text-[3.4rem] font-black italic leading-[0.88] text-white sm:text-[4.8rem]">
-                Electric Aura.
+                Premium Press-Ons.
               </h1>
               <p className="mt-4 max-w-md text-sm leading-7 text-white/84 sm:text-base">
-                A mobile-first storefront inspired by editorial beauty layouts, tactile surfaces, and soft app-like
-                motion.
+                Discover salon-quality, hand-painted press-on nails. Easily find your perfect fit and order directly from your phone.
               </p>
 
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -67,8 +63,8 @@ export function HomePage() {
           <div className="page-shell flex items-end justify-between gap-4">
             <SectionIntro
               eyebrow="Shop by shape"
-              title="Swipe through silhouettes made for different moods."
-              description="The original design leans on tactile cards and generous spacing, so the mobile version keeps that rhythm intact with a thumb-friendly horizontal flow."
+              title="Find the perfect silhouette for your next look."
+              description="Whether you want bold stiletto drama or a soft everyday round, explore our curated collections."
             />
           </div>
           <div className="hide-scrollbar flex gap-4 overflow-x-auto px-[max(0.625rem,calc((100vw-1200px)/2+0.625rem))] pb-2">
@@ -98,8 +94,8 @@ export function HomePage() {
           <div className="flex items-center justify-between gap-4">
             <SectionIntro
               eyebrow="Curated sets"
-              title="A fast product grid tuned for phones first."
-              description="On mobile, the cards stay in two columns for comfort and touch accuracy. From tablet upward, the grid expands to four across."
+              title="Hand-painted designs ready to ship."
+              description="Explore our best-sellers and latest drops, crafted with premium gels for long-lasting wear."
             />
             <Link
               to="/shop"
@@ -145,8 +141,7 @@ export function HomePage() {
                 Zero Wait.
               </h2>
               <p className="max-w-md text-sm leading-7 text-secondary sm:text-base">
-                Hand-painted, multi-layered, and structurally reinforced. The storefront keeps that premium feeling,
-                but the browsing flow is simplified for one-hand mobile use.
+                Hand-painted, multi-layered, and structurally reinforced. Get the durability of an acrylic set without sitting in a salon chair for hours.
               </p>
               <div className="space-y-4 text-sm font-bold uppercase tracking-[0.2em] text-brand-ink">
                 <div className="flex items-center gap-3">
@@ -182,9 +177,9 @@ export function HomePage() {
         <section className="page-shell space-y-6">
           <div className="flex items-end justify-between gap-4">
             <SectionIntro
-              eyebrow="Editorial feed"
-              title="Tap into previews built for vertical scrolling."
-              description="The feed keeps the moodboard-style composition from the source design, while each card opens into a simple preview for phones."
+              eyebrow="Studio Feed"
+              title="Watch our latest sets in motion."
+              description="See our press-ons in real life. Browse styling ideas, tutorials, and recent client looks straight from our Instagram."
             />
             <Link
               to="/feed"
@@ -194,32 +189,15 @@ export function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-            {editorialPosts.map((post, index) => (
-              <button
-                key={post.id}
-                type="button"
-                onClick={() => setPreviewPostId(post.id)}
-                className={`group relative overflow-hidden rounded-[1.75rem] text-left ${
-                  index === 0 ? "col-span-2 row-span-2" : ""
-                }`}
-              >
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  loading="lazy"
-                  decoding="async"
-                  className={`h-full w-full object-cover transition duration-700 group-hover:scale-[1.04] ${
-                    index === 0 ? "min-h-[18rem]" : "aspect-square"
-                  }`}
-                />
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent,rgba(75,33,49,0.78))]" />
-                <div className="absolute inset-x-4 bottom-4">
-                  <p className="text-[0.62rem] font-bold uppercase tracking-[0.24em] text-white/80">{post.accent}</p>
-                  <p className="editorial-text mt-2 text-[1.45rem] font-bold text-white">{post.title}</p>
-                </div>
-              </button>
-            ))}
+          <div className="surface-panel overflow-hidden rounded-[1.75rem] py-16 px-6 text-center">
+            <h3 className="editorial-text text-[2rem] font-bold text-brand-ink">Follow our journey</h3>
+            <p className="mt-2 text-sm leading-6 text-secondary mb-6">See real client sets, styling inspiration, and studio updates.</p>
+            <Link
+              to="/feed"
+              className="cta-gradient inline-flex min-h-12 items-center justify-center gap-3 rounded-full px-6 py-3 text-[0.72rem] font-bold uppercase tracking-[0.28em] text-white"
+            >
+              Watch our Reels
+            </Link>
           </div>
         </section>
 
@@ -248,8 +226,6 @@ export function HomePage() {
           </div>
         </section>
       </main>
-
-      <EditorialPreviewModal post={previewPost} onClose={() => setPreviewPostId(null)} />
     </>
   );
 }

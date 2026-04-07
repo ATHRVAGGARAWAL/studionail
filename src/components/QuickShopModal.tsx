@@ -7,19 +7,20 @@ interface QuickShopModalProps {
   product: Product | null;
   onAddToBag: (product: Product, size: string) => void;
   onClose: () => void;
+  preselectedSize?: string;
 }
 
 const sizes = ["XS", "S", "M", "L"] as const;
 
-export function QuickShopModal({ product, onAddToBag, onClose }: QuickShopModalProps) {
-  const [selectedSize, setSelectedSize] = useState<(typeof sizes)[number]>("S");
+export function QuickShopModal({ product, onAddToBag, onClose, preselectedSize }: QuickShopModalProps) {
+  const [selectedSize, setSelectedSize] = useState<string>("S");
 
   useEffect(() => {
     if (!product) {
       return undefined;
     }
 
-    setSelectedSize("S");
+    setSelectedSize(preselectedSize ?? "S");
 
     function handleEscape(event: KeyboardEvent) {
       if (event.key === "Escape") {
@@ -34,7 +35,7 @@ export function QuickShopModal({ product, onAddToBag, onClose }: QuickShopModalP
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [onClose, product]);
+  }, [onClose, product, preselectedSize]);
 
   if (!product) {
     return null;
@@ -111,6 +112,19 @@ export function QuickShopModal({ product, onAddToBag, onClose }: QuickShopModalP
                       {size}
                     </button>
                   ))}
+                  {preselectedSize && !sizes.includes(preselectedSize as any) && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedSize(preselectedSize)}
+                      className={`flex min-h-[2.75rem] items-center justify-center rounded-[0.8rem] border px-2 text-[0.78rem] font-bold transition ${
+                        selectedSize === preselectedSize
+                          ? "cta-gradient border-transparent text-white"
+                          : "border-outline-soft bg-white/72 text-brand-ink"
+                      }`}
+                    >
+                      Custom
+                    </button>
+                  )}
                 </div>
               </div>
 

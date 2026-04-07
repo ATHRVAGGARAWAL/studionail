@@ -54,7 +54,7 @@ export function BrandLockup({ size = "sm", tone = "default", className = "" }: B
           Nail Art
         </p>
         <p className={`mt-1 font-bold uppercase leading-none ${currentSize.subtitle} ${currentTone.subtitle}`}>
-          by Shalini Mitall
+          Studio
         </p>
       </div>
     </div>

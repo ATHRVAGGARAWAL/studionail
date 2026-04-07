@@ -3,6 +3,7 @@ import { Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ProductCard } from "@/components/ProductCard";
 import { QuickShopModal } from "@/components/QuickShopModal";
+import { SizingWizardModal } from "@/components/SizingWizardModal";
 import { type Product, type ProductCategory } from "@/data/storefront";
 import { useStore } from "@/state/store";
 
@@ -50,10 +51,11 @@ const shopFilters: ShopFilter[] = [
 ];
 
 export function ShopPage({ onAddToBag, whatsappHref }: ShopPageProps) {
-  const { products } = useStore();
+  const { products, userSize, saveUserSize } = useStore();
   const [activeFilterId, setActiveFilterId] = useState("all");
   const [query, setQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [sizingWizardOpen, setSizingWizardOpen] = useState(false);
   const deferredQuery = useDeferredValue(query);
 
   const normalizedQuery = deferredQuery.trim().toLowerCase();
@@ -81,7 +83,7 @@ export function ShopPage({ onAddToBag, whatsappHref }: ShopPageProps) {
               Summer 2026 collection
             </p>
             <h1 className="editorial-text mt-2 max-w-[12rem] text-[1.75rem] font-black leading-[0.88] text-brand-ink sm:max-w-2xl sm:text-[3rem] md:text-[3.8rem]">
-              The Electric <span className="italic text-secondary">Artisan Series</span>
+              The Essential <span className="italic text-secondary">Collection</span>
             </h1>
             <p className="mt-2 text-[0.72rem] leading-5 text-secondary sm:hidden">
               {filteredProducts.length} of {products.length} curated styles
@@ -127,6 +129,13 @@ export function ShopPage({ onAddToBag, whatsappHref }: ShopPageProps) {
               <div className="hidden items-center justify-between text-[0.7rem] text-secondary sm:flex">
                 <span>{filteredProducts.length} styles showing</span>
                 <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSizingWizardOpen(true)}
+                    className="rounded-full bg-brand/10 px-3 py-2 font-semibold text-brand transition hover:bg-brand/20"
+                  >
+                    {userSize ? `Size: ${userSize}` : "Find My Size"}
+                  </button>
                   <a
                     href={whatsappHref}
                     target="_blank"
@@ -144,6 +153,17 @@ export function ShopPage({ onAddToBag, whatsappHref }: ShopPageProps) {
                 </div>
               </div>
             </div>
+          </div>
+          
+          {/* Mobile bottom nav add-on for sizing */}
+          <div className="md:hidden mt-2 flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => setSizingWizardOpen(true)}
+              className="rounded-full bg-brand/10 px-4 py-2 font-bold uppercase tracking-[0.1em] text-[0.68rem] text-brand transition hover:bg-brand/20 w-fit"
+            >
+              {userSize ? `Your Size: ${userSize}` : "Find My Size"}
+            </button>
           </div>
         </section>
 
@@ -163,7 +183,8 @@ export function ShopPage({ onAddToBag, whatsappHref }: ShopPageProps) {
         ) : null}
       </main>
 
-      <QuickShopModal product={selectedProduct} onAddToBag={onAddToBag} onClose={() => setSelectedProduct(null)} />
+      <QuickShopModal product={selectedProduct} onAddToBag={onAddToBag} onClose={() => setSelectedProduct(null)} preselectedSize={userSize || undefined} />
+      <SizingWizardModal open={sizingWizardOpen} onClose={() => setSizingWizardOpen(false)} onSave={saveUserSize} />
     </>
   );
 }

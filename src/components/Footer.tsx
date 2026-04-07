@@ -25,8 +25,7 @@ export function Footer() {
           <div className="space-y-4">
             <BrandLockup size="md" />
             <p className="max-w-md text-sm leading-7 text-secondary">
-              Premium press-on sets, custom sizing guidance, and a soft editorial storefront built for quick mobile
-              browsing.
+              Premium press-on sets, custom sizing guidance, and handcrafted nail art delivered straight to your door.
             </p>
           </div>
 

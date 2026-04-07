@@ -8,10 +8,10 @@ interface MenuSheetProps {
 }
 
 const links = [
-  { to: "/", title: "Home", copy: "Editorial landing and featured drops" },
+  { to: "/", title: "Home", copy: "Discover our seasonal drops and best sellers" },
   { to: "/shop", title: "Shop", copy: "Browse curated press-on collections" },
   { to: "/cart", title: "Cart", copy: "Review items and continue checkout" },
-  { to: "/feed", title: "Feed", copy: "Preview the studio's latest visual stories" },
+  { to: "/feed", title: "Feed", copy: "See our sets styled in real life" },
   { to: "/booking", title: "Booking", copy: "Tap through service, date, and confirmation" }
 ];
 

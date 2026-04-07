@@ -19,6 +19,7 @@ export interface Order {
 interface StoreState {
   products: Product[];
   orders: Order[];
+  userSize: string | null;
 }
 
 interface NewProductInput {
@@ -42,6 +43,7 @@ interface StoreContextValue extends StoreState {
   removeOrder: (orderId: string) => void;
   placeOrder: (input: Omit<Order, "id" | "createdAt" | "status"> & { status?: OrderStatus }) => Order | null;
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
+  saveUserSize: (size: string | null) => void;
 }
 
 const STORAGE_KEY = "studionail-store-v2";
@@ -99,7 +101,8 @@ function normalizeOrders(orders: Order[], products: Product[]) {
 function loadInitialState(): StoreState {
   const fallbackState: StoreState = {
     products: normalizeProducts(seedProducts),
-    orders: seedOrders
+    orders: seedOrders,
+    userSize: null
   };
 
   if (typeof window === "undefined") {
@@ -117,7 +120,8 @@ function loadInitialState(): StoreState {
 
     return {
       products: normalizeProducts(parsed.products ?? seedProducts),
-      orders: normalizeOrders(Array.isArray(parsed.orders) ? parsed.orders : seedOrders, normalizeProducts(parsed.products ?? seedProducts))
+      orders: normalizeOrders(Array.isArray(parsed.orders) ? parsed.orders : seedOrders, normalizeProducts(parsed.products ?? seedProducts)),
+      userSize: typeof parsed.userSize === "string" ? parsed.userSize : null
     };
   } catch {
     return fallbackState;
@@ -214,6 +218,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
 
     const nextState = {
+      ...state,
       products: state.products.map((item) =>
         item.id === input.productId ? { ...item, stock: item.stock - input.quantity } : item
       ),
@@ -234,6 +239,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     persist(nextState);
   }
 
+  function saveUserSize(size: string | null) {
+    const nextState = {
+      ...state,
+      userSize: size
+    };
+
+    persist(nextState);
+  }
+
   const value: StoreContextValue = {
     ...state,
     addProduct,
@@ -242,7 +256,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     adjustProductStock,
     removeOrder,
     placeOrder,
-    updateOrderStatus
+    updateOrderStatus,
+    saveUserSize
   };
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

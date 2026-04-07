@@ -50,12 +50,10 @@ export interface ShapeCollection {
   image: string;
 }
 
-export interface EditorialPost {
+export interface ReelPost {
   id: string;
+  url: string;
   title: string;
-  caption: string;
-  image: string;
-  accent: string;
 }
 
 export interface Service {
@@ -216,38 +214,26 @@ export const products: Product[] = [
   }
 ];
 
-export const editorialPosts: EditorialPost[] = [
+export const reelPosts: ReelPost[] = [
   {
-    id: "editorial-01",
-    title: "Backstage color story",
-    caption: "High-shine coral polish styled like a cover shoot, now translated into wearable press-on sets.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuA5exJje8FHzHQSq-0cRny6K8LYwUSRttTiTfKLeXOq_hseO1usQHDYmHXJ_AM4ndfUy6Yu_YpvE7p9I5n8TmLIe5so0bybPmk_GkJVtVtn_jfyBfm4PIMufRI1csIbXKvibnJ_uKyQPePTKw48ZxwJLZT2iEV2_M8dQauGsroiADmcvX2w5zDEB0VP4fYnC27zprwee_f0l6RaCZPZOsD22VgUdfx53flFzcJ-jQ_1xNTbXgkq_tMYiMwne5uiBOuRiR8UArz1s7mx",
-    accent: "Cover moment"
+    id: "reel-01",
+    url: "https://www.instagram.com/p/C-0pXz_T9jO/embed",
+    title: "Nail Art Studio - Look 1"
   },
   {
-    id: "editorial-02",
-    title: "Iridescent close-up",
-    caption: "Oil-slick shimmer and soft lighting that inspired this season's chrome finishes.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDm3-dwr6qswUwLvgTdY6BM6qBE53_nPY0TJOqUib0xxfjxgYv23W4qJ-iY0CYwyzkU-OiomtDT8S4mbDfWos_MwSnrAiAA_Af2vxkpIPzHJ01pmxsiKhWlLMaoeUmW2fJUOFs2V5sZ6uB28G2cya9k9emwRagzhj1xM8l-bsZWIlFL7Tzd7N7l4GEq1YLSFQqwZZ7D5ELsePBZjt0LYcr4lXVXNzeTtiJ8i_ZZRAyWf25PkRxPWEHG5hBcXAlR_Xr3hD1vSxeF_tU4",
-    accent: "Reel preview"
+    id: "reel-02",
+    url: "https://www.instagram.com/p/C-t0oR8zTzJ/embed",
+    title: "Nail Art Studio - Look 2"
   },
   {
-    id: "editorial-03",
-    title: "Tropical flash",
-    caption: "Electric pink and citrus yellow details translated into a bright drop for summer weekends.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuD8jZOsNbJ-4GZiVo90lpdBPYFD_nJkbw5gcTLKjoJzWnTH1K14QWoEj8LLtPZ_aK7rewe0Ayn4FxgIl6tGFHCz18FrY35uq5Dg1fLyJRJ7-yEPHb06gIpelq3rXGue0ty_64v04LgWQlRNq2tT4vE6lTsHgZWfuuSwb1pk0Jw5lW2OQB-z4xCI3XkmuFJY2nE4Ls6HgAh3TkSrH7Zk4_ll5UpdvGFpygNmyTbu-1CNYzmC3ISjxR58ROvDTrlDV2I-Q0GSUhWzDMil",
-    accent: "Summer drop"
+    id: "reel-03",
+    url: "https://www.instagram.com/p/C-hOzQ7TC7f/embed",
+    title: "Nail Art Studio - Look 3"
   },
   {
-    id: "editorial-04",
-    title: "Set layout",
-    caption: "A scroll-friendly grid of press-on sets, styling tools, and tonal shadows for the feed.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDeQzlxQB8YriPEug8RMtFquV5tFQUODzUdAT_tbDq02si3boQy4jYeHgRIUr1nUmtg9j54KzFr7kfv2ABfZEbQu2zDrnTlUgkGD87S6pMpvEiZS_u-u-I59z87QX7hI66g-ZAGl3jBUU-sA0ERzUBnJInUz6LmO7vzplP2HbaVAmSxEF2LQx5ewJpOjC2yAM_ibptR28HuH7KvMrQ2fDqnBXr625XmF5sIdnqmokmLnKEGAI0gYEdDUtAiLjm7tYMwF2yUFU-apQ9l",
-    accent: "Studio flatlay"
+    id: "reel-04",
+    url: "https://www.instagram.com/p/C-e0zRWTsP_/embed",
+    title: "Nail Art Studio - Look 4"
   }
 ];
 
