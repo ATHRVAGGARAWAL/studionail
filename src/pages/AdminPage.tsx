@@ -1,9 +1,9 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { CalendarDays, CheckCircle2, LogOut, Package, Plus, ShoppingBag, Trash2, Truck } from "lucide-react";
+import { CalendarDays, CalendarCheck, CheckCircle2, LogOut, Package, Plus, ShoppingBag, Trash2, Truck, XCircle } from "lucide-react";
 import { SectionIntro } from "@/components/SectionIntro";
 import { type ProductCategory } from "@/data/storefront";
 import { useAdminAccess } from "@/state/adminAccess";
-import { useStore, type OrderStatus } from "@/state/store";
+import { useStore, type OrderStatus, type BookingStatus } from "@/state/store";
 import { supabase } from "@/lib/supabase";
 
 const categoryOptions: Exclude<ProductCategory, "All">[] = [
@@ -30,7 +30,7 @@ const initialDraft = {
 
 export function AdminPage() {
   const { logout } = useAdminAccess();
-  const { products, orders, addProduct, deleteProduct, updateProductStock, adjustProductStock, updateOrderStatus, syncToRemote, isSyncing } =
+  const { products, orders, bookings, addProduct, deleteProduct, updateProductStock, adjustProductStock, updateOrderStatus, updateBookingStatus, syncToRemote, isSyncing } =
     useStore();
   const [draft, setDraft] = useState(initialDraft);
 
@@ -47,9 +47,11 @@ export function AdminPage() {
       products: products.length,
       lowStock,
       orders: orders.length,
-      completed
+      completed,
+      bookings: bookings.length,
+      confirmedBookings: bookings.filter((b) => b.status === "Confirmed").length
     };
-  }, [orders, products]);
+  }, [orders, products, bookings]);
 
   function resetDraft() {
     setDraft(initialDraft);
@@ -107,7 +109,7 @@ export function AdminPage() {
               {isSyncing ? "Saving..." : "Save Changes"}
             </button>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div className="rounded-[1.25rem] bg-white/72 px-4 py-4">
               <p className="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-secondary">Products</p>
               <p className="mt-2 text-3xl font-black text-brand-ink">{stats.products}</p>
@@ -123,6 +125,14 @@ export function AdminPage() {
             <div className="rounded-[1.25rem] bg-white/72 px-4 py-4">
               <p className="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-secondary">Completed</p>
               <p className="mt-2 text-3xl font-black text-brand-ink">{stats.completed}</p>
+            </div>
+            <div className="rounded-[1.25rem] bg-white/72 px-4 py-4">
+              <p className="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-secondary">Bookings</p>
+              <p className="mt-2 text-3xl font-black text-brand-ink">{stats.bookings}</p>
+            </div>
+            <div className="rounded-[1.25rem] bg-white/72 px-4 py-4">
+              <p className="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-secondary">Upcoming</p>
+              <p className="mt-2 text-3xl font-black text-brand-ink">{stats.confirmedBookings}</p>
             </div>
           </div>
         </div>
@@ -426,6 +436,107 @@ export function AdminPage() {
               ))}
             </div>
           </section>
+        </div>
+      </section>
+
+      {/* Bookings Management */}
+      <section className="surface-panel rounded-[2rem] p-5 sm:p-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand text-white">
+            <CalendarCheck className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-secondary">Bookings</p>
+            <h2 className="editorial-text text-[1.65rem] font-black text-brand-ink">Appointment calendar</h2>
+          </div>
+        </div>
+
+        <div className="mt-6 space-y-4">
+          {bookings.length === 0 ? (
+            <div className="rounded-[1.5rem] bg-white/72 px-5 py-8 text-center text-sm leading-7 text-secondary">
+              No bookings yet. Customer appointments will appear here once they book through the website.
+            </div>
+          ) : null}
+
+          {bookings.map((booking) => {
+            const date = new Date(booking.booking_date);
+            const statusColor = booking.status === "Confirmed"
+              ? "bg-blue-500/10 text-blue-700"
+              : booking.status === "Completed"
+                ? "bg-emerald-500/10 text-emerald-700"
+                : "bg-red-500/10 text-red-700";
+
+            return (
+              <article key={booking.id} className="rounded-[1.5rem] bg-white/72 p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className={`rounded-full px-3 py-1 text-[0.62rem] font-bold uppercase tracking-[0.22em] ${statusColor}`}>
+                        {booking.status}
+                      </span>
+                      <span className="rounded-full bg-surface-low px-3 py-1 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-secondary">
+                        ₹{booking.total}
+                      </span>
+                    </div>
+                    <h3 className="editorial-text mt-3 text-[1.2rem] font-bold text-brand-ink">
+                      {booking.service_id.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                    </h3>
+                    {booking.enhancements && booking.enhancements.length > 0 && (
+                      <p className="mt-1 text-sm leading-6 text-secondary">
+                        + {booking.enhancements.join(', ')}
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-secondary">Date</p>
+                    <p className="mt-1 text-sm font-bold text-brand-ink">{date.toLocaleDateString()}</p>
+                    <p className="mt-1 text-xs text-secondary">{booking.slot}</p>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 text-sm text-secondary">
+                    <CalendarDays className="h-4 w-4 text-brand" />
+                    Booked {new Date(booking.created_at).toLocaleString()}
+                  </div>
+                  <div className="flex gap-2">
+                    {booking.status === "Confirmed" && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => updateBookingStatus(booking.id, "Completed")}
+                          className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-white"
+                        >
+                          <CheckCircle2 className="h-4 w-4" />
+                          Complete
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => updateBookingStatus(booking.id, "Cancelled")}
+                          className="inline-flex items-center gap-2 rounded-full bg-red-500/10 px-4 py-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-red-700"
+                        >
+                          <XCircle className="h-4 w-4" />
+                          Cancel
+                        </button>
+                      </>
+                    )}
+                    {booking.status === "Completed" && (
+                      <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-4 py-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-emerald-700">
+                        <Truck className="h-4 w-4" />
+                        Done
+                      </span>
+                    )}
+                    {booking.status === "Cancelled" && (
+                      <span className="inline-flex items-center gap-2 rounded-full bg-red-500/10 px-4 py-2 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-red-700">
+                        <XCircle className="h-4 w-4" />
+                        Cancelled
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
     </main>

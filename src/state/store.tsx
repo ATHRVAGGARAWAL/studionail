@@ -4,6 +4,7 @@ import { products as seedProducts, type Product, type ProductCategory } from "@/
 
 export type OrderStatus = "New" | "Processing" | "Completed";
 export type OrderChannel = "Site" | "WhatsApp";
+export type BookingStatus = "Confirmed" | "Completed" | "Cancelled";
 
 export interface Order {
   id: string;
@@ -17,9 +18,21 @@ export interface Order {
   createdAt: string;
 }
 
+export interface Booking {
+  id: string;
+  service_id: string;
+  enhancements: string[];
+  booking_date: string;
+  slot: string;
+  total: string;
+  status: BookingStatus;
+  created_at: string;
+}
+
 interface StoreState {
   products: Product[];
   orders: Order[];
+  bookings: Booking[];
   userSize: string | null;
 }
 
@@ -45,6 +58,7 @@ interface StoreContextValue extends StoreState {
   removeOrder: (orderId: string) => void;
   placeOrder: (input: Omit<Order, "id" | "createdAt" | "status"> & { status?: OrderStatus }) => Order | null;
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
+  updateBookingStatus: (bookingId: string, status: BookingStatus) => void;
   saveUserSize: (size: string | null) => void;
   syncToRemote: () => Promise<void>;
   isSyncing: boolean;
@@ -106,6 +120,7 @@ function loadInitialState(): StoreState {
   const fallbackState: StoreState = {
     products: normalizeProducts(seedProducts),
     orders: seedOrders,
+    bookings: [],
     userSize: null
   };
 
@@ -125,6 +140,7 @@ function loadInitialState(): StoreState {
     return {
       products: normalizeProducts(parsed.products ?? seedProducts),
       orders: normalizeOrders(Array.isArray(parsed.orders) ? parsed.orders : seedOrders, normalizeProducts(parsed.products ?? seedProducts)),
+      bookings: [],
       userSize: typeof parsed.userSize === "string" ? parsed.userSize : null
     };
   } catch {
@@ -142,10 +158,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function fetchData() {
       const { data: remoteProducts } = await supabase.from('products').select('*');
-      if (remoteProducts && remoteProducts.length > 0) {
-        setState((s) => persist({
-          ...s,
-          products: remoteProducts.map(p => ({
+      const { data: remoteOrders } = await supabase.from('orders').select('*');
+      const { data: remoteBookings } = await supabase.from('bookings').select('*').order('created_at', { ascending: false });
+
+      setState((s) => {
+        const nextState = { ...s };
+
+        if (remoteProducts && remoteProducts.length > 0) {
+          nextState.products = remoteProducts.map(p => ({
             id: p.id,
             name: p.name,
             price: p.price,
@@ -158,9 +178,29 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             image: p.image,
             images: p.images || [],
             reviewCount: p.review_count || 0
-          }))
-        }, false));
-      }
+          }));
+        }
+
+        if (remoteOrders && remoteOrders.length > 0) {
+          nextState.orders = remoteOrders.map(o => ({
+            id: o.id,
+            productId: o.product_id,
+            productName: o.product_name,
+            quantity: o.quantity,
+            size: o.size || '',
+            unitPrice: 0,
+            channel: o.channel || 'Site',
+            status: o.status || 'New',
+            createdAt: o.created_at
+          }));
+        }
+
+        if (remoteBookings) {
+          nextState.bookings = remoteBookings;
+        }
+
+        return persist(nextState, false);
+      });
     }
     fetchData();
   }, []);
@@ -182,6 +222,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   async function syncToRemote() {
     setIsSyncing(true);
     try {
+      // Sync products
       const productUpserts = state.products.map(p => ({
         id: p.id,
         name: p.name,
@@ -192,12 +233,31 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         shape: p.shape,
         finish: p.finish,
         description: p.description,
-        image: p.images?.[0] || p.image, // ensure first image
+        image: p.images?.[0] || p.image,
         images: p.images || [],
         review_count: p.reviewCount
       }));
       await supabase.from('products').upsert(productUpserts, { onConflict: 'id' });
-      alert('Changes successfully synced to live website!');
+
+      // Sync orders
+      const orderUpserts = state.orders.map(o => ({
+        id: o.id,
+        product_id: o.productId,
+        product_name: o.productName,
+        quantity: o.quantity,
+        size: o.size,
+        channel: o.channel,
+        status: o.status,
+        created_at: o.createdAt
+      }));
+      await supabase.from('orders').upsert(orderUpserts, { onConflict: 'id' });
+
+      // Sync booking statuses
+      for (const b of state.bookings) {
+        await supabase.from('bookings').update({ status: b.status }).eq('id', b.id);
+      }
+
+      alert('All changes synced to live website!');
     } catch (err) {
       console.error(err);
       alert('Sync failed - see console log.');
@@ -301,6 +361,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     persist(nextState);
   }
 
+  function updateBookingStatus(bookingId: string, status: BookingStatus) {
+    const nextState = {
+      ...state,
+      bookings: state.bookings.map((b) => (b.id === bookingId ? { ...b, status } : b))
+    };
+
+    persist(nextState);
+  }
+
   function saveUserSize(size: string | null) {
     const nextState = {
       ...state,
@@ -319,6 +388,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     removeOrder,
     placeOrder,
     updateOrderStatus,
+    updateBookingStatus,
     saveUserSize,
     syncToRemote,
     isSyncing
