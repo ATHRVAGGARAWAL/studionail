@@ -12,6 +12,7 @@
   "dependencies": {
     "@fontsource/noto-serif": "^5.2.6",
     "@fontsource/plus-jakarta-sans": "^5.2.6",
+    "@supabase/supabase-js": "^2.103.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.511.0",
     "react": "^19.2.0",

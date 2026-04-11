@@ -10,7 +10,18 @@ export function ProductCard({ product, onQuickShop }: ProductCardProps) {
   const soldOut = product.stock <= 0;
 
   return (
-    <article className="group flex flex-col">
+    <article
+      className="group flex cursor-pointer flex-col"
+      onClick={() => onQuickShop(product)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onQuickShop(product);
+        }
+      }}
+    >
       <div className="relative aspect-[3/4] overflow-hidden rounded-[0.4rem] bg-surface-high">
         <img
           src={product.image}
@@ -27,6 +38,7 @@ export function ProductCard({ product, onQuickShop }: ProductCardProps) {
         <button
           type="button"
           aria-label={`Save ${product.name}`}
+          onClick={(e) => e.stopPropagation()}
           className="absolute bottom-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-white/65 text-brand opacity-100 backdrop-blur transition active:scale-95 sm:bottom-2 sm:right-2 sm:h-8 sm:w-8 sm:opacity-0 sm:group-hover:opacity-100"
         >
           <Heart className="h-3.5 w-3.5" />
@@ -55,7 +67,10 @@ export function ProductCard({ product, onQuickShop }: ProductCardProps) {
         </div>
         <button
           type="button"
-          onClick={() => onQuickShop(product)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onQuickShop(product);
+          }}
           disabled={soldOut}
           className="mt-2 flex min-h-8 w-full items-center justify-center border border-outline-soft/25 px-2.5 py-2 text-[0.5rem] font-bold uppercase tracking-[0.18em] text-brand-ink transition hover:border-brand hover:bg-brand hover:text-white disabled:cursor-not-allowed disabled:border-outline-soft/30 disabled:bg-white/50 disabled:text-secondary sm:text-[0.56rem]"
         >
