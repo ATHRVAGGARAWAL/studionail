@@ -38,7 +38,7 @@ export function CartPage() {
             </div>
             <div className="rounded-[1.25rem] bg-white/72 px-4 py-4">
               <p className="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-secondary">Total</p>
-              <p className="mt-2 text-3xl font-black text-brand-ink">${cartTotal}</p>
+              <p className="mt-2 text-3xl font-black text-brand-ink">₹{cartTotal}</p>
             </div>
           </div>
         </div>
@@ -112,9 +112,9 @@ export function CartPage() {
                           Qty {order.quantity}
                         </span>
                         <span className="rounded-full bg-white/80 px-3 py-2 font-bold text-brand-ink">
-                          ${unitPrice} each
+                          ₹{unitPrice} each
                         </span>
-                        <span className="rounded-full bg-brand/10 px-3 py-2 font-bold text-brand">${lineTotal}</span>
+                        <span className="rounded-full bg-brand/10 px-3 py-2 font-bold text-brand">₹{lineTotal}</span>
                       </div>
                     </div>
                   </div>
@@ -137,12 +137,15 @@ export function CartPage() {
               </div>
               <div className="flex items-center justify-between text-sm font-semibold text-brand-ink">
                 <span>Subtotal</span>
-                <span>${cartTotal}</span>
+                <span>₹{cartTotal}</span>
               </div>
               <div className="flex items-center justify-between text-sm font-semibold text-brand-ink">
                 <span>Delivery</span>
                 <span>Discuss on WhatsApp</span>
               </div>
+              <p className="text-[0.62rem] text-secondary/60 text-right italic">
+                * Delivery charges may apply
+              </p>
             </div>
 
             <div className="mt-6 flex flex-col gap-3">

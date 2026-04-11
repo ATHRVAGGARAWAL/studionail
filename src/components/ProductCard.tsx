@@ -55,7 +55,7 @@ export function ProductCard({ product, onQuickShop }: ProductCardProps) {
               {product.finish}
             </p>
           </div>
-          <span className="shrink-0 text-[0.8rem] font-bold text-brand sm:text-[0.88rem]">${product.price}</span>
+          <span className="shrink-0 text-[0.8rem] font-bold text-brand sm:text-[0.88rem]">₹{product.price}</span>
         </div>
         <div className="mt-1 flex items-center justify-between gap-2">
           <p className="text-[0.5rem] font-bold uppercase tracking-[0.18em] text-secondary sm:text-[0.56rem]">

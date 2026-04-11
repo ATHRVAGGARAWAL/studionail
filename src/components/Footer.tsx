@@ -12,9 +12,9 @@ const pageLinks = [
 ];
 
 const socialLinks = [
-  { href: "https://instagram.com", label: "Instagram", icon: Instagram },
+  { href: "https://www.instagram.com/pressonnailsbyshalini/", label: "Instagram", icon: Instagram },
   { href: buildWhatsAppUrl("Hi Studio Nail, I would like to chat about an order."), label: "WhatsApp", icon: MessageCircle },
-  { href: "tel:+910000000000", label: "Call Studio", icon: Phone }
+  { href: "tel:+919815754676", label: "Call Studio", icon: Phone }
 ];
 
 export function Footer() {

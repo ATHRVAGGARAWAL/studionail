@@ -140,7 +140,7 @@ export function BookingFlow() {
                         <p className="mt-2 text-sm leading-6 text-secondary">{service.description}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-lg font-black text-brand">${service.price}</p>
+                        <p className="text-lg font-black text-brand">₹{service.price}</p>
                         {isSelected ? (
                           <span className="mt-2 inline-flex rounded-full bg-brand px-2 py-1 text-[0.58rem] font-bold uppercase tracking-[0.22em] text-white">
                             Selected
@@ -199,7 +199,7 @@ export function BookingFlow() {
                     <p className={`mt-1 text-sm ${isActive ? "text-white/85" : "text-secondary"}`}>
                       {enhancement.description}
                     </p>
-                    <p className="mt-4 text-sm font-black">+${enhancement.price}</p>
+                    <p className="mt-4 text-sm font-black">+₹{enhancement.price}</p>
                   </button>
                 );
               })}
@@ -295,7 +295,7 @@ export function BookingFlow() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-[0.62rem] font-bold uppercase tracking-[0.24em] text-secondary">Total estimated</p>
-            <p className="editorial-text mt-1 text-[2rem] font-black text-brand-ink">${total.toFixed(2)}</p>
+            <p className="editorial-text mt-1 text-[2rem] font-black text-brand-ink">₹{total}</p>
           </div>
           <button
             type="button"

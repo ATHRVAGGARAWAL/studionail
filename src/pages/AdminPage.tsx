@@ -1,9 +1,9 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { CalendarDays, CalendarCheck, CheckCircle2, LogOut, Package, Plus, ShoppingBag, Trash2, Truck, XCircle } from "lucide-react";
+import { CalendarDays, CalendarCheck, CheckCircle2, Edit, LogOut, Package, Plus, ShoppingBag, Trash2, Truck, XCircle } from "lucide-react";
 import { SectionIntro } from "@/components/SectionIntro";
 import { type ProductCategory } from "@/data/storefront";
 import { useAdminAccess } from "@/state/adminAccess";
-import { useStore, type OrderStatus, type BookingStatus } from "@/state/store";
+import { useStore, type Order, type Booking, type OrderStatus, type BookingStatus } from "@/state/store";
 import { supabase } from "@/lib/supabase";
 
 const categoryOptions: Exclude<ProductCategory, "All">[] = [
@@ -30,14 +30,29 @@ const initialDraft = {
 
 export function AdminPage() {
   const { logout } = useAdminAccess();
-  const { products, orders, bookings, addProduct, deleteProduct, updateProductStock, adjustProductStock, updateOrderStatus, updateBookingStatus, syncToRemote, isSyncing } =
+  const { products, orders, bookings, addProduct, updateProduct, deleteProduct, updateProductStock, adjustProductStock, updateOrderStatus, updateBookingStatus, syncToRemote, isSyncing } =
     useStore();
   const [draft, setDraft] = useState(initialDraft);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [orderFilter, setOrderFilter] = useState<"Active" | "Completed" | "All">("Active");
+  const [bookingFilter, setBookingFilter] = useState<"Active" | "Completed" | "All">("Active");
 
   const sortedOrders = useMemo(
     () => [...orders].sort((left, right) => right.createdAt.localeCompare(left.createdAt)),
     [orders]
   );
+
+  const filteredOrders = useMemo(() => {
+    if (orderFilter === "Active") return sortedOrders.filter((o: Order) => o.status !== "Completed");
+    if (orderFilter === "Completed") return sortedOrders.filter((o: Order) => o.status === "Completed");
+    return sortedOrders;
+  }, [sortedOrders, orderFilter]);
+
+  const filteredBookings = useMemo(() => {
+    if (bookingFilter === "Active") return bookings.filter((b: Booking) => b.status === "Confirmed");
+    if (bookingFilter === "Completed") return bookings.filter((b: Booking) => b.status === "Completed");
+    return bookings;
+  }, [bookings, bookingFilter]);
 
   const stats = useMemo(() => {
     const lowStock = products.filter((product) => product.stock > 0 && product.stock <= 3).length;
@@ -55,6 +70,24 @@ export function AdminPage() {
 
   function resetDraft() {
     setDraft(initialDraft);
+    setEditingProductId(null);
+  }
+
+  function startEdit(product: any) {
+    setEditingProductId(product.id);
+    setDraft({
+      name: product.name,
+      price: String(product.price),
+      stock: String(product.stock),
+      badge: product.badge || "",
+      category: product.category,
+      shape: product.shape,
+      finish: product.finish,
+      description: product.description,
+      image: product.image,
+      images: product.images || []
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -64,19 +97,34 @@ export function AdminPage() {
       return;
     }
 
-    addProduct({
-      name: draft.name.trim(),
-      price: Number(draft.price) || 0,
-      stock: Number(draft.stock) || 0,
-      badge: draft.badge.trim() || undefined,
-      category: draft.category,
-      shape: draft.shape.trim(),
-      finish: draft.finish.trim(),
-      description: draft.description.trim(),
-      image: draft.images.length > 0 ? draft.images[0] : draft.image.trim(),
-      images: draft.images,
-      reviewCount: 0
-    });
+    if (editingProductId) {
+      updateProduct(editingProductId, {
+        name: draft.name.trim(),
+        price: Number(draft.price) || 0,
+        stock: Number(draft.stock) || 0,
+        badge: draft.badge.trim() || undefined,
+        category: draft.category,
+        shape: draft.shape.trim(),
+        finish: draft.finish.trim(),
+        description: draft.description.trim(),
+        image: draft.images.length > 0 ? draft.images[0] : draft.image.trim(),
+        images: draft.images
+      });
+    } else {
+      addProduct({
+        name: draft.name.trim(),
+        price: Number(draft.price) || 0,
+        stock: Number(draft.stock) || 0,
+        badge: draft.badge.trim() || undefined,
+        category: draft.category,
+        shape: draft.shape.trim(),
+        finish: draft.finish.trim(),
+        description: draft.description.trim(),
+        image: draft.images.length > 0 ? draft.images[0] : draft.image.trim(),
+        images: draft.images,
+        reviewCount: 0
+      });
+    }
 
     resetDraft();
   }
@@ -145,8 +193,12 @@ export function AdminPage() {
               <Plus className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-secondary">Add product</p>
-              <h2 className="editorial-text text-[1.65rem] font-black text-brand-ink">Create a new set</h2>
+              <p className="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-secondary">
+                {editingProductId ? "Edit product" : "Add product"}
+              </p>
+              <h2 className="editorial-text text-[1.65rem] font-black text-brand-ink">
+                {editingProductId ? "Modify existing set" : "Create a new set"}
+              </h2>
             </div>
           </div>
 
@@ -279,13 +331,24 @@ export function AdminPage() {
               />
             </label>
 
-            <button
-              type="submit"
-              className="cta-gradient flex min-h-12 items-center justify-center gap-3 rounded-full px-5 py-3 text-[0.72rem] font-bold uppercase tracking-[0.28em] text-white"
-            >
-              <Plus className="h-4 w-4" />
-              Add product
-            </button>
+            <div className="flex gap-3">
+              <button
+                type="submit"
+                className="cta-gradient flex h-12 flex-1 items-center justify-center gap-3 rounded-full px-5 py-3 text-[0.72rem] font-bold uppercase tracking-[0.28em] text-white"
+              >
+                {editingProductId ? <CheckCircle2 className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                {editingProductId ? "Update Product" : "Add product"}
+              </button>
+              {editingProductId && (
+                <button
+                  type="button"
+                  onClick={resetDraft}
+                  className="flex h-12 items-center justify-center rounded-full border border-outline-soft bg-white px-6 text-[0.72rem] font-bold uppercase tracking-[0.28em] text-secondary"
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
           </form>
         </div>
 
@@ -295,20 +358,34 @@ export function AdminPage() {
               <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand text-white">
                 <ShoppingBag className="h-5 w-5" />
               </div>
-              <div>
+              <div className="flex-1 min-w-0">
                 <p className="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-secondary">Orders</p>
-                <h2 className="editorial-text text-[1.65rem] font-black text-brand-ink">Process requests</h2>
+                <h2 className="editorial-text text-[1.65rem] font-black text-brand-ink whitespace-nowrap overflow-hidden text-ellipsis">Process requests</h2>
               </div>
             </div>
 
+            <div className="mt-6 flex flex-wrap gap-2">
+              {(["Active", "Completed", "All"] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setOrderFilter(f)}
+                  className={`rounded-full px-4 py-2 text-[0.62rem] font-bold uppercase tracking-[0.22em] transition ${
+                    orderFilter === f ? "bg-brand text-white" : "bg-surface-low text-secondary hover:bg-surface-high"
+                  }`}
+                >
+                  {f === "Completed" ? "Shipped" : f}
+                </button>
+              ))}
+            </div>
+
             <div className="mt-6 space-y-4">
-              {sortedOrders.length === 0 ? (
+              {filteredOrders.length === 0 ? (
                 <div className="rounded-[1.5rem] bg-white/72 px-5 py-8 text-center text-sm leading-7 text-secondary">
-                  No orders yet. Add a bag item from the shop to see the flow here.
+                  {orderFilter === "Active" ? "No active orders." : orderFilter === "Completed" ? "No completed orders yet." : "No orders found."}
                 </div>
               ) : null}
 
-              {sortedOrders.map((order) => {
+              {filteredOrders.map((order: Order) => {
                 const currentIndex = statusFlow.indexOf(order.status);
                 const nextStatus = statusFlow[Math.min(currentIndex + 1, statusFlow.length - 1)];
 
@@ -392,14 +469,24 @@ export function AdminPage() {
                             {product.category} · {product.shape}
                           </p>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => deleteProduct(product.id)}
-                          className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-brand transition hover:bg-brand hover:text-white"
-                          aria-label={`Delete ${product.name}`}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => startEdit(product)}
+                            className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-secondary transition hover:bg-brand hover:text-white"
+                            aria-label={`Edit ${product.name}`}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => deleteProduct(product.id)}
+                            className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-brand transition hover:bg-brand hover:text-white"
+                            aria-label={`Delete ${product.name}`}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
 
                       <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -427,7 +514,7 @@ export function AdminPage() {
                           +
                         </button>
                         <span className="ml-auto rounded-full bg-surface-low px-3 py-2 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-secondary">
-                          ${product.price} · {product.stock} in stock
+                          ₹{product.price} · {product.stock} in stock
                         </span>
                       </div>
                     </div>
@@ -451,14 +538,28 @@ export function AdminPage() {
           </div>
         </div>
 
+        <div className="mt-6 flex flex-wrap gap-2">
+          {(["Active", "Completed", "All"] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => setBookingFilter(f)}
+              className={`rounded-full px-4 py-2 text-[0.62rem] font-bold uppercase tracking-[0.22em] transition ${
+                bookingFilter === f ? "bg-brand text-white" : "bg-surface-low text-secondary hover:bg-surface-high"
+              }`}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+
         <div className="mt-6 space-y-4">
-          {bookings.length === 0 ? (
+          {filteredBookings.length === 0 ? (
             <div className="rounded-[1.5rem] bg-white/72 px-5 py-8 text-center text-sm leading-7 text-secondary">
-              No bookings yet. Customer appointments will appear here once they book through the website.
+              {bookingFilter === "Active" ? "No upcoming bookings." : bookingFilter === "Completed" ? "No completed bookings yet." : "No bookings found."}
             </div>
           ) : null}
 
-          {bookings.map((booking) => {
+          {filteredBookings.map((booking) => {
             const date = new Date(booking.booking_date);
             const statusColor = booking.status === "Confirmed"
               ? "bg-blue-500/10 text-blue-700"

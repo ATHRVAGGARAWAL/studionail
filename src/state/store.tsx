@@ -60,6 +60,7 @@ interface StoreContextValue extends StoreState {
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
   updateBookingStatus: (bookingId: string, status: BookingStatus) => void;
   saveUserSize: (size: string | null) => void;
+  updateProduct: (productId: string, updates: Partial<NewProductInput>) => void;
   syncToRemote: () => Promise<void>;
   isSyncing: boolean;
 }
@@ -73,7 +74,7 @@ const seedOrders: Order[] = [
     productName: "Azure Electric Fluid",
     quantity: 1,
     size: "M",
-    unitPrice: 45,
+    unitPrice: 3600,
     channel: "Site",
     status: "New",
     createdAt: "2026-04-05T08:20:00.000Z"
@@ -84,7 +85,7 @@ const seedOrders: Order[] = [
     productName: "Botanical Hunter",
     quantity: 2,
     size: "S",
-    unitPrice: 44,
+    unitPrice: 3520,
     channel: "WhatsApp",
     status: "Processing",
     createdAt: "2026-04-04T15:10:00.000Z"
@@ -282,6 +283,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     persist(nextState);
   }
 
+  function updateProduct(productId: string, updates: Partial<NewProductInput>) {
+    const nextState = {
+      ...state,
+      products: state.products.map((product) =>
+        product.id === productId ? { ...product, ...updates } : product
+      )
+    };
+
+    persist(nextState);
+  }
+
   function deleteProduct(productId: string) {
     const nextState = {
       ...state,
@@ -390,6 +402,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     updateOrderStatus,
     updateBookingStatus,
     saveUserSize,
+    updateProduct,
     syncToRemote,
     isSyncing
   };

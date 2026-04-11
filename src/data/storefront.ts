@@ -109,7 +109,7 @@ export const products: Product[] = [
   {
     id: "crimson-velvet",
     name: "Crimson Velvet Gloss",
-    price: 42,
+    price: 3360,
     stock: 7,
     badge: "New",
     category: "Neon",
@@ -123,7 +123,7 @@ export const products: Product[] = [
   {
     id: "gilded-rose",
     name: "Gilded Rose Petal",
-    price: 38,
+    price: 3040,
     stock: 5,
     category: "Signature",
     shape: "Stiletto",
@@ -136,7 +136,7 @@ export const products: Product[] = [
   {
     id: "azure-electric",
     name: "Azure Electric Fluid",
-    price: 45,
+    price: 3600,
     stock: 4,
     badge: "Best Seller",
     category: "Avant-Garde",
@@ -150,7 +150,7 @@ export const products: Product[] = [
   {
     id: "onyx-geometry",
     name: "Onyx Geometry",
-    price: 35,
+    price: 2800,
     stock: 12,
     category: "Minimalist",
     shape: "Round",
@@ -163,7 +163,7 @@ export const products: Product[] = [
   {
     id: "lunar-pearl",
     name: "Lunar Pearl Glaze",
-    price: 39,
+    price: 3120,
     stock: 6,
     category: "Signature",
     shape: "Almond",
@@ -176,7 +176,7 @@ export const products: Product[] = [
   {
     id: "violet-whisper",
     name: "Violet Whisper",
-    price: 40,
+    price: 3200,
     stock: 3,
     category: "Avant-Garde",
     shape: "Oval",
@@ -189,7 +189,7 @@ export const products: Product[] = [
   {
     id: "botanical-hunter",
     name: "Botanical Hunter",
-    price: 44,
+    price: 3520,
     stock: 2,
     badge: "Editors",
     category: "Minimalist",
@@ -203,7 +203,7 @@ export const products: Product[] = [
   {
     id: "solar-flare",
     name: "Solar Flare Glass",
-    price: 42,
+    price: 3360,
     stock: 8,
     category: "Neon",
     shape: "Round",
@@ -218,22 +218,22 @@ export const products: Product[] = [
 export const reelPosts: ReelPost[] = [
   {
     id: "reel-01",
-    url: "https://www.instagram.com/p/C-0pXz_T9jO/embed",
+    url: "https://www.instagram.com/p/DTVXAcPEnE5/embed",
     title: "Nail Art Studio - Look 1"
   },
   {
     id: "reel-02",
-    url: "https://www.instagram.com/p/C-t0oR8zTzJ/embed",
+    url: "https://www.instagram.com/p/DU03ddcEgJW/embed",
     title: "Nail Art Studio - Look 2"
   },
   {
     id: "reel-03",
-    url: "https://www.instagram.com/p/C-hOzQ7TC7f/embed",
+    url: "https://www.instagram.com/p/DT8K23IjSVC/embed",
     title: "Nail Art Studio - Look 3"
   },
   {
     id: "reel-04",
-    url: "https://www.instagram.com/p/C-e0zRWTsP_/embed",
+    url: "https://www.instagram.com/p/DS7npDbEkHI/embed",
     title: "Nail Art Studio - Look 4"
   }
 ];
@@ -242,7 +242,7 @@ export const services: Service[] = [
   {
     id: "electric-couture",
     name: "Electric Couture",
-    price: 85,
+    price: 6800,
     duration: 60,
     description: "Full sculpting set with high-gloss finish and custom pigment mixing.",
     image:
@@ -251,7 +251,7 @@ export const services: Service[] = [
   {
     id: "minimalist-zen",
     name: "Minimalist Zen",
-    price: 65,
+    price: 5200,
     duration: 45,
     description: "Organic nail shaping with breathable polish and botanical cuticle care.",
     image:
@@ -260,7 +260,7 @@ export const services: Service[] = [
   {
     id: "avant-garde-set",
     name: "Avant-Garde Set",
-    price: 120,
+    price: 9600,
     duration: 90,
     description: "Structural 3D art and metallic overlays for a bold editorial look.",
     image:
@@ -273,21 +273,21 @@ export const enhancements: Enhancement[] = [
     id: "silk-wrap",
     name: "Silk Wrap",
     description: "Strengthening",
-    price: 15,
+    price: 1200,
     icon: "sparkles"
   },
   {
     id: "paraffin-dip",
     name: "Paraffin Dip",
     description: "Deep hydration",
-    price: 20,
+    price: 1600,
     icon: "droplets"
   },
   {
     id: "nail-art",
     name: "Nail Art",
     description: "2 finger focus",
-    price: 25,
+    price: 2000,
     icon: "palette"
   }
 ];

@@ -75,7 +75,7 @@ export function QuickShopModal({ product, onAddToBag, onClose, preselectedSize }
                 <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
               </div>
               <div className="absolute right-0 top-10 rounded-l-full bg-brand px-7 py-3 text-white shadow-[0_16px_32px_rgba(182,13,61,0.26)]">
-                <p className="editorial-text text-[1.8rem] font-black italic">${product.price.toFixed(2)}</p>
+                <p className="editorial-text text-[1.8rem] font-black italic">₹{product.price}</p>
               </div>
             </div>
 
