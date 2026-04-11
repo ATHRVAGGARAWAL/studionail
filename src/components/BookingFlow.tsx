@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowRight, Droplets, Palette, Sparkles } from "lucide-react";
 import { bookingSlots, enhancements, services } from "@/data/storefront";
+import { supabase } from "@/lib/supabase";
 
 type Step = "service" | "time" | "confirm";
 
@@ -41,7 +42,7 @@ export function BookingFlow() {
     );
   }
 
-  function moveForward() {
+  async function moveForward() {
     if (step === "service") {
       setStep("time");
       return;
@@ -52,7 +53,20 @@ export function BookingFlow() {
       return;
     }
 
-    setConfirmed(true);
+    try {
+      await supabase.from("bookings").insert({
+        service_id: selectedServiceId,
+        enhancements: selectedEnhancements,
+        booking_date: selectedDate.toISOString(),
+        slot: selectedSlot,
+        total: total.toFixed(2),
+        status: "Confirmed"
+      });
+      setConfirmed(true);
+    } catch (e) {
+      console.error(e);
+      alert("Failed to confirm booking. Please try again.");
+    }
   }
 
   const ctaLabel =
@@ -271,8 +285,7 @@ export function BookingFlow() {
           </div>
           {confirmed ? (
             <p className="mt-5 rounded-[1.4rem] bg-brand/8 px-4 py-4 text-sm leading-7 text-brand-ink">
-              Your appointment is locked in locally for this frontend demo. A real calendar sync can be layered on
-              later without changing the UI structure.
+              Your appointment is officially locked in! We've synced your request to our production calendar and will see you then.
             </p>
           ) : null}
         </section>

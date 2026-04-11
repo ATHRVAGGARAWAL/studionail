@@ -4,6 +4,7 @@ import { SectionIntro } from "@/components/SectionIntro";
 import { type ProductCategory } from "@/data/storefront";
 import { useAdminAccess } from "@/state/adminAccess";
 import { useStore, type OrderStatus } from "@/state/store";
+import { supabase } from "@/lib/supabase";
 
 const categoryOptions: Exclude<ProductCategory, "All">[] = [
   "Minimalist",
@@ -23,12 +24,13 @@ const initialDraft = {
   shape: "",
   finish: "",
   description: "",
-  image: ""
+  image: "",
+  images: [] as string[]
 };
 
 export function AdminPage() {
   const { logout } = useAdminAccess();
-  const { products, orders, addProduct, deleteProduct, updateProductStock, adjustProductStock, updateOrderStatus } =
+  const { products, orders, addProduct, deleteProduct, updateProductStock, adjustProductStock, updateOrderStatus, syncToRemote, isSyncing } =
     useStore();
   const [draft, setDraft] = useState(initialDraft);
 
@@ -56,7 +58,7 @@ export function AdminPage() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!draft.name.trim() || !draft.image.trim() || !draft.description.trim() || !draft.shape.trim()) {
+    if (!draft.name.trim() || (!draft.image.trim() && draft.images.length === 0) || !draft.description.trim() || !draft.shape.trim()) {
       return;
     }
 
@@ -69,7 +71,8 @@ export function AdminPage() {
       shape: draft.shape.trim(),
       finish: draft.finish.trim(),
       description: draft.description.trim(),
-      image: draft.image.trim(),
+      image: draft.images.length > 0 ? draft.images[0] : draft.image.trim(),
+      images: draft.images,
       reviewCount: 0
     });
 
@@ -93,6 +96,15 @@ export function AdminPage() {
             >
               <LogOut className="h-4 w-4 text-brand" />
               Sign out
+            </button>
+            <button
+              type="button"
+              onClick={() => syncToRemote()}
+              disabled={isSyncing}
+              className="ml-3 inline-flex min-h-11 items-center gap-2 rounded-full border border-brand bg-brand px-4 py-3 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-white transition hover:bg-brand/90 disabled:opacity-50"
+            >
+              <CheckCircle2 className="h-4 w-4" />
+              {isSyncing ? "Saving..." : "Save Changes"}
             </button>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -212,13 +224,36 @@ export function AdminPage() {
                 />
               </label>
               <label className="space-y-2">
-                <span className="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-secondary">Image URL</span>
+                <span className="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-secondary">Images (up to 3)</span>
                 <input
-                  value={draft.image}
-                  onChange={(event) => setDraft((current) => ({ ...current, image: event.target.value }))}
+                  type="file"
+                  multiple
+                  accept="image/png, image/jpeg"
+                  onChange={async (event) => {
+                    const files = Array.from(event.target.files || []).slice(0, 3);
+                    const uploadedUrls: string[] = [];
+                    for (const file of files) {
+                      const fileExt = file.name.split('.').pop();
+                      const fileName = `${Math.random()}.${fileExt}`;
+                      const { data, error } = await supabase.storage.from('product-images').upload(fileName, file);
+                      if (data) {
+                        const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(fileName);
+                        uploadedUrls.push(publicUrl);
+                      } else {
+                        console.error("Upload error", error);
+                      }
+                    }
+                    if (uploadedUrls.length > 0) {
+                      setDraft((current) => ({ ...current, images: [...current.images, ...uploadedUrls] }));
+                    }
+                  }}
                   className="w-full rounded-[1.1rem] border border-outline-soft bg-white/85 px-4 py-3 text-sm outline-none"
-                  placeholder="https://..."
                 />
+                {draft.images.length > 0 && (
+                  <div className="flex gap-2 mt-2">
+                    {draft.images.map(img => <img key={img} src={img} className="w-10 h-10 object-cover rounded-md" />)}
+                  </div>
+                )}
               </label>
             </div>
 

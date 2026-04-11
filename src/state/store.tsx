@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import { supabase } from "../lib/supabase";
 import { products as seedProducts, type Product, type ProductCategory } from "@/data/storefront";
 
 export type OrderStatus = "New" | "Processing" | "Completed";
@@ -33,6 +34,7 @@ interface NewProductInput {
   description: string;
   image: string;
   reviewCount?: number;
+  images?: string[];
 }
 
 interface StoreContextValue extends StoreState {
@@ -44,6 +46,8 @@ interface StoreContextValue extends StoreState {
   placeOrder: (input: Omit<Order, "id" | "createdAt" | "status"> & { status?: OrderStatus }) => Order | null;
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
   saveUserSize: (size: string | null) => void;
+  syncToRemote: () => Promise<void>;
+  isSyncing: boolean;
 }
 
 const STORAGE_KEY = "studionail-store-v2";
@@ -132,8 +136,36 @@ const StoreContext = createContext<StoreContextValue | null>(null);
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<StoreState>(() => loadInitialState());
+  const [isSyncing, setIsSyncing] = useState(false);
 
-  function persist(nextState: StoreState) {
+  // Initial load from Supabase
+  useEffect(() => {
+    async function fetchData() {
+      const { data: remoteProducts } = await supabase.from('products').select('*');
+      if (remoteProducts && remoteProducts.length > 0) {
+        setState((s) => persist({
+          ...s,
+          products: remoteProducts.map(p => ({
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            stock: p.stock,
+            badge: p.badge,
+            category: p.category,
+            shape: p.shape,
+            finish: p.finish,
+            description: p.description,
+            image: p.image,
+            images: p.images || [],
+            reviewCount: p.review_count || 0
+          }))
+        }, false));
+      }
+    }
+    fetchData();
+  }, []);
+
+  function persist(nextState: StoreState, writeToLocal = true) {
     const normalizedState = {
       ...nextState,
       products: normalizeProducts(nextState.products)
@@ -141,16 +173,45 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
     setState(normalizedState);
 
-    if (typeof window !== "undefined") {
+    if (writeToLocal && typeof window !== "undefined") {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizedState));
+    }
+    return normalizedState;
+  }
+
+  async function syncToRemote() {
+    setIsSyncing(true);
+    try {
+      const productUpserts = state.products.map(p => ({
+        id: p.id,
+        name: p.name,
+        price: p.price,
+        stock: p.stock,
+        badge: p.badge,
+        category: p.category,
+        shape: p.shape,
+        finish: p.finish,
+        description: p.description,
+        image: p.images?.[0] || p.image, // ensure first image
+        images: p.images || [],
+        review_count: p.reviewCount
+      }));
+      await supabase.from('products').upsert(productUpserts, { onConflict: 'id' });
+      alert('Changes successfully synced to live website!');
+    } catch (err) {
+      console.error(err);
+      alert('Sync failed - see console log.');
+    } finally {
+      setIsSyncing(false);
     }
   }
 
-  function addProduct(product: NewProductInput) {
+  function addProduct(product: NewProductInput & { images?: string[] }) {
     const nextProduct: Product = {
       id: createId("product"),
       reviewCount: product.reviewCount ?? 0,
-      ...product
+      images: product.images || [],
+      ...product,
     };
 
     const nextState = {
@@ -169,6 +230,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
 
     persist(nextState);
+    supabase.from('products').delete().eq('id', productId).then(); // async background delete
   }
 
   function updateProductStock(productId: string, stock: number) {
@@ -257,7 +319,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     removeOrder,
     placeOrder,
     updateOrderStatus,
-    saveUserSize
+    saveUserSize,
+    syncToRemote,
+    isSyncing
   };
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
