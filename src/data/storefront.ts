@@ -38,6 +38,7 @@ export interface Product {
   finish: string;
   description: string;
   image: string;
+  images?: string[];
   reviewCount: number;
   guidance?: ProductGuidance;
   tryOn?: ProductTryOn;
