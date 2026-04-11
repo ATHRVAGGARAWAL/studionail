@@ -46,15 +46,15 @@ export function BrandLockup({ size = "sm", tone = "default", className = "" }: B
     <div className={`flex items-center ${currentSize.wrap} ${className}`.trim()}>
       <img
         src={brandMark}
-        alt="Nail Art by Shalini Mitall logo"
+        alt="Nail Art Studio - Shalini Mittal logo"
         className={`${currentSize.logo} shrink-0 object-cover shadow-[0_14px_28px_rgba(186,19,64,0.12)]`}
       />
       <div className="min-w-0">
         <p className={`editorial-text font-black italic leading-none ${currentSize.title} ${currentTone.title}`}>
-          Nail Art
+          Nail Art Studio
         </p>
         <p className={`mt-1 font-bold uppercase leading-none ${currentSize.subtitle} ${currentTone.subtitle}`}>
-          Studio
+          Shalini Mittal
         </p>
       </div>
     </div>
