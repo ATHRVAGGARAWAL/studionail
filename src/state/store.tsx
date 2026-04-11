@@ -333,6 +333,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
 
     persist(nextState);
+    supabase.from('orders').delete().eq('id', orderId).then(({ error }) => {
+      if (error) console.error("Error deleting order from Supabase:", error);
+    });
   }
 
   function placeOrder(
@@ -361,6 +364,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
     persist(nextState);
 
+    // Sync to Supabase as well
+    supabase.from('orders').insert({
+      id: nextOrder.id,
+      product_id: nextOrder.productId,
+      product_name: nextOrder.productName,
+      quantity: nextOrder.quantity,
+      size: nextOrder.size,
+      channel: nextOrder.channel,
+      status: nextOrder.status,
+      created_at: nextOrder.createdAt
+    }).then(({ error }) => {
+      if (error) console.error("Error inserting order to Supabase:", error);
+    });
+
     return nextOrder;
   }
 
@@ -380,6 +397,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
 
     persist(nextState);
+    supabase.from('bookings').update({ status }).eq('id', bookingId).then(({ error }) => {
+      if (error) console.error("Error updating booking status in Supabase:", error);
+    });
   }
 
   function saveUserSize(size: string | null) {
